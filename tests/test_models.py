@@ -39,6 +39,36 @@ class BookModelTests(TestCase):
 
         self.assertEqual(str(book), expected_str)
 
+    def test_setting_inventory_on_instance_creation(self):
+        book_data = SAMPLE_BOOK_DATA
+        book = Book.objects.create(**book_data)
+
+        self.assertEqual(book.inventory, book.total_amount)
+
+    def test_setting_inventory_on_instance_update_without_borrowed_books(self):
+        book_data = SAMPLE_BOOK_DATA
+        book = Book.objects.create(**book_data)
+        new_total_amount = 30
+
+        book.total_amount = new_total_amount
+        book.save()
+
+        self.assertEqual(book.inventory, new_total_amount)
+
+    def test_setting_inventory_on_instance_update_with_borrowed_books(self):
+        book_data = SAMPLE_BOOK_DATA
+        book = Book.objects.create(**book_data)
+        user = get_user_model().objects.create_user(
+            username="john_doe", password="testpass"
+        )
+        Borrowing.objects.create(user=user, book=book, borrow_date=now().date())
+        new_total_amount = 30
+
+        book.total_amount = new_total_amount
+        book.save()
+
+        self.assertEqual(book.inventory, new_total_amount - 1)
+
 
 class BorrowingModelTests(TestCase):
     def setUp(self) -> None:
