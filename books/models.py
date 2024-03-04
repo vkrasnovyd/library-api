@@ -12,7 +12,17 @@ class Book(models.Model):
     author = models.CharField(max_length=150)
     cover = models.CharField(choices=BOOK_COVER_CHOICES, max_length=1)
     total_amount = models.PositiveIntegerField()
+    inventory = models.PositiveIntegerField()
     daily_fee = models.DecimalField(default=0, decimal_places=2, max_digits=4)
 
     def __str__(self):
         return f"{self.title} ({self.author})"
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.inventory = self.total_amount
+        else:
+            num_borrowed_books = self.borrowings.count()
+            self.inventory = self.total_amount - num_borrowed_books
+
+        super().save(*args, **kwargs)
