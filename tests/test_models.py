@@ -1,7 +1,11 @@
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.utils.timezone import now
 
 from books.models import Book
+from borrowings.models import Borrowing
 
 SAMPLE_BOOK_DATA = {
     "title": "Test book",
@@ -34,3 +38,37 @@ class BookModelTests(TestCase):
         expected_str = f"{book_data['title']} ({book_data['author']})"
 
         self.assertEqual(str(book), expected_str)
+
+
+class BorrowingModelTests(TestCase):
+    def setUp(self) -> None:
+        user = get_user_model().objects.create_user(
+            username="john_doe", password="testpass"
+        )
+        book = Book.objects.create(**SAMPLE_BOOK_DATA)
+        self.borrowing_data = {
+            "borrow_date": now().date(),
+            "user": user,
+            "book": book,
+        }
+
+    def test_borrowing_expected_return_date_is_today_plus_two_weeks(self):
+        borrowing = Borrowing.objects.create(**self.borrowing_data)
+
+        expected_result = self.borrowing_data[
+            "borrow_date"
+        ] + datetime.timedelta(weeks=2)
+
+        self.assertEqual(borrowing.expected_return_date, expected_result)
+
+    def test_borrowing_str_is_book_str_title_expected_return_date(self):
+        borrowing = Borrowing.objects.create(**self.borrowing_data)
+
+        expected_return_date = self.borrowing_data[
+            "borrow_date"
+        ] + datetime.timedelta(weeks=2)
+        expected_str = (
+            f"{self.borrowing_data['book']} - {expected_return_date}"
+        )
+
+        self.assertEqual(str(borrowing), expected_str)
