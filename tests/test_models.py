@@ -31,6 +31,8 @@ class BookModelTests(TestCase):
 
     def test_book_str_is_title_author(self):
         book = Book.objects.create(**self.book_data)
-        expected_str = f"{self.book_data['title']} ({self.book_data['author']})"
+        expected_str = (
+            f"{self.book_data['title']} ({self.book_data['author']})"
+        )
 
         self.assertEqual(str(book), expected_str)

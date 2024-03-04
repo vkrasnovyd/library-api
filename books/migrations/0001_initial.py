@@ -33,7 +33,9 @@ class Migration(migrations.Migration):
                 ("total_amount", models.PositiveIntegerField()),
                 (
                     "daily_fee",
-                    models.DecimalField(decimal_places=2, default=0, max_digits=4),
+                    models.DecimalField(
+                        decimal_places=2, default=0, max_digits=4
+                    ),
                 ),
             ],
         ),
