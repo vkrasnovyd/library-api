@@ -3,6 +3,14 @@ from django.test import TestCase
 
 from books.models import Book
 
+SAMPLE_BOOK_DATA = {
+    "title": "Test book",
+    "author": "Name Surname",
+    "cover": "Hard",
+    "total_amount": 25,
+    "daily_fee": 0.10,
+}
+
 
 class UserModelTests(TestCase):
     def test_user_str_is_first_name_last_name(self):
@@ -20,19 +28,9 @@ class UserModelTests(TestCase):
 
 
 class BookModelTests(TestCase):
-    def setUp(self) -> None:
-        self.book_data = {
-            "title": "Test book",
-            "author": "Name Surname",
-            "cover": "Hard",
-            "total_amount": 25,
-            "daily_fee": 0.10,
-        }
-
     def test_book_str_is_title_author(self):
-        book = Book.objects.create(**self.book_data)
-        expected_str = (
-            f"{self.book_data['title']} ({self.book_data['author']})"
-        )
+        book_data = SAMPLE_BOOK_DATA
+        book = Book.objects.create(**book_data)
+        expected_str = f"{book_data['title']} ({book_data['author']})"
 
         self.assertEqual(str(book), expected_str)
