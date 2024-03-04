@@ -1,4 +1,4 @@
 urlpatterns = []
 
 
-app_name = "user"
+app_name = "users"
