@@ -5,7 +5,11 @@ from rest_framework.settings import api_settings
 
 from paginators import Pagination
 from permissions import IsUserAdminOrOwnUserProfileAccessOnly
-from users.serializers import UserSerializer
+from users.serializers import (
+    UserSerializer,
+    UserDetailSerializer,
+    UserListSerializer,
+)
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -26,3 +30,12 @@ class UserViewSet(
     pagination_class = Pagination
     serializer_class = UserSerializer
     queryset = get_user_model().objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return UserDetailSerializer
+
+        if self.action == "update":
+            return UserSerializer
+
+        return UserListSerializer
