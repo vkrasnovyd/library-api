@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from books.models import Book
 from books.serializers import (
     BookListSerializer,
-    BookSerializer,
+    BookDetailSerializer,
     BookCreateUpdateSerializer,
 )
 from paginators import Pagination
@@ -23,4 +23,4 @@ class BookViewSet(viewsets.ModelViewSet):
         if self.action in ["create", "update", "partial_update"]:
             return BookCreateUpdateSerializer
 
-        return BookSerializer
+        return BookDetailSerializer

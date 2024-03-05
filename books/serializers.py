@@ -3,11 +3,13 @@ from rest_framework import serializers
 from books.models import Book
 
 
-class BookSerializer(serializers.ModelSerializer):
+class BookDetailSerializer(serializers.ModelSerializer):
+    cover = serializers.CharField(source="get_cover_display")
 
     class Meta:
         model = Book
         fields = (
+            "id",
             "title",
             "author",
             "cover",
