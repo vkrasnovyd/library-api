@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework import generics, viewsets, mixins
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
@@ -39,3 +40,18 @@ class UserViewSet(
             return UserSerializer
 
         return UserListSerializer
+
+    def get_queryset(self):
+        queryset = get_user_model().objects.all()
+
+        if self.action == "list":
+            search_string = self.request.query_params.get("search", None)
+
+            if search_string:
+                queryset = queryset.filter(
+                    Q(username__icontains=search_string)
+                    | Q(first_name__icontains=search_string)
+                    | Q(last_name__icontains=search_string)
+                ).distinct()
+
+        return queryset
