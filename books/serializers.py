@@ -17,6 +17,19 @@ class BookSerializer(serializers.ModelSerializer):
         )
 
 
+class BookCreateUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Book
+        fields = (
+            "title",
+            "author",
+            "cover",
+            "total_amount",
+            "daily_fee",
+        )
+
+
 class BookListSerializer(serializers.ModelSerializer):
 
     class Meta:
