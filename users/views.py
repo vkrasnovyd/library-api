@@ -55,3 +55,8 @@ class UserViewSet(
                 ).distinct()
 
         return queryset
+
+    def get_object(self):
+        if self.kwargs.get("pk", None) == "me":
+            self.kwargs["pk"] = self.request.user.pk
+        return super(UserViewSet, self).get_object()
