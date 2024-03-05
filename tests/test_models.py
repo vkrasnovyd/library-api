@@ -61,7 +61,9 @@ class BookModelTests(TestCase):
         user = get_user_model().objects.create_user(
             username="john_doe", password="testpass"
         )
-        Borrowing.objects.create(user=user, book=book, borrow_date=now().date())
+        Borrowing.objects.create(
+            user=user, book=book, borrow_date=now().date()
+        )
         new_total_amount = 30
 
         book.total_amount = new_total_amount
