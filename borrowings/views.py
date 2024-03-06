@@ -58,6 +58,3 @@ class BorrowingViewSet(
             return BorrowingListSerializer
 
         return BorrowingSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(borrow_date=now().date())
