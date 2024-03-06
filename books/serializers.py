@@ -33,7 +33,19 @@ class BookCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class BookListSerializer(serializers.ModelSerializer):
+    detail_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
-        fields = ("id", "title", "author", "inventory", "daily_fee")
+        fields = (
+            "id",
+            "title",
+            "author",
+            "inventory",
+            "daily_fee",
+            "detail_url",
+        )
+
+    @staticmethod
+    def get_detail_url(instance):
+        return instance.get_full_absolute_url()
