@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -22,8 +21,6 @@ SAMPLE_PAYLOAD = {
 
 
 def get_sample_borrowing(book=None, user=None, **params) -> Borrowing:
-    borrow_date = now().date()
-
     if not user:
         user = get_sample_user()
 
@@ -31,7 +28,6 @@ def get_sample_borrowing(book=None, user=None, **params) -> Borrowing:
         book = get_sample_book()
 
     defaults = {
-        "borrow_date": borrow_date,
         "book": book,
         "user": user,
     }
