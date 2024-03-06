@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
+from settings import BASE_URL
+
 BOOK_COVER_CHOICES = [
     ("H", "Hard"),
     ("S", "Soft"),
@@ -29,3 +31,6 @@ class Book(models.Model):
 
     def get_absolute_url(self):
         return reverse("books:book-detail", kwargs={"pk": self.id})
+
+    def get_full_absolute_url(self):
+        return f"{BASE_URL}{self.get_absolute_url()}"

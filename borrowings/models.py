@@ -5,6 +5,7 @@ from django.db import models
 from django.urls import reverse
 
 from books.models import Book
+from settings import BASE_URL
 
 
 class Borrowing(models.Model):
@@ -30,3 +31,6 @@ class Borrowing(models.Model):
 
     def get_absolute_url(self):
         return reverse("borrowings:borrowing-detail", kwargs={"pk": self.id})
+
+    def get_full_absolute_url(self):
+        return f"{BASE_URL}{self.get_absolute_url()}"
