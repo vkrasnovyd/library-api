@@ -42,3 +42,26 @@ class IsAdminUserOrReadOnly(BasePermission):
             request.method in SAFE_METHODS
             or (request.user and request.user.is_staff)
         )
+
+
+class IsUserAdminOrOwnInstancesAccessOnly(BasePermission):
+    """
+    Allows all users to get list and detail endpoints of their instances.
+    Allows admins to get detail endpoints of all instances and create new.
+    """
+
+    def has_permission(self, request, view):
+        return bool(
+            (
+                request.method in SAFE_METHODS
+                and request.user
+                and request.user.is_authenticated
+            )
+            or (request.user and request.user.is_staff)
+        )
+
+    def has_object_permission(self, request, view, obj):
+        return bool(
+            obj.user == request.user
+            or (request.user and request.user.is_staff)
+        )
