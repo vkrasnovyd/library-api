@@ -29,4 +29,13 @@ class BorrowingViewSet(
                 if user_id:
                     queryset = queryset.filter(user_id=user_id)
 
+        if self.action == "list":
+            is_active = self.request.query_params.get("is_active", None)
+
+            if is_active:
+                if is_active == "True":
+                    queryset = queryset.filter(is_active=True)
+                elif is_active == "False":
+                    queryset = queryset.filter(is_active=False)
+
         return queryset
