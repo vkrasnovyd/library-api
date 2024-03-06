@@ -1,9 +1,21 @@
+from datetime import timedelta
+
+from django.db.models import Q
+from django.utils.timezone import now
 from rest_framework import mixins, viewsets
 
 from borrowings.models import Borrowing
 from borrowings.serializers import BorrowingSerializer, BorrowingListSerializer
 from paginators import Pagination
 from permissions import IsUserAdminOrOwnInstancesAccessOnly
+
+
+def annotate_borrowing_is_overdue(queryset):
+    tomorrow = now().date() + timedelta(days=1)
+    queryset = queryset.annotate(
+        is_overdue=Q(is_active=True) & Q(expected_return_date__lte=tomorrow)
+    )
+    return queryset
 
 
 class BorrowingViewSet(
@@ -17,6 +29,7 @@ class BorrowingViewSet(
 
     def get_queryset(self):
         queryset = Borrowing.objects.all()
+        queryset = annotate_borrowing_is_overdue(queryset)
 
         if not self.request.user.is_staff:
             queryset = queryset.filter(user=self.request.user)

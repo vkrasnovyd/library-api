@@ -22,6 +22,7 @@ class BorrowingListSerializer(serializers.ModelSerializer):
             "book",
             "user",
             "is_active",
+            "is_overdue",
             "borrow_date",
             "expected_return_date",
             "actual_return_date",
