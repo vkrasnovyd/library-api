@@ -9,7 +9,6 @@ from rest_framework.test import APIClient
 from users.models import User
 from users.serializers import (
     UserDetailSerializer,
-    UserSerializer,
     UserListSerializer,
 )
 
@@ -24,6 +23,7 @@ def get_sample_user(**params) -> User:
     defaults = {
         "username": f"user{num_users}",
         "password": "samplepass",
+        "email": f"user{num_users}@user.com",
         "first_name": "John",
         "last_name": "Doe",
     }
