@@ -1,3 +1,18 @@
-from django.shortcuts import render
+from rest_framework import mixins, viewsets
 
-# Create your views here.
+from borrowings.models import Borrowing
+from borrowings.serializers import BorrowingSerializer
+from paginators import Pagination
+from permissions import IsUserAdminOrOwnInstancesAccessOnly
+
+
+class BorrowingViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Borrowing.objects.all()
+    serializer_class = BorrowingSerializer
+    permission_classes = (IsUserAdminOrOwnInstancesAccessOnly,)
+    pagination_class = Pagination
