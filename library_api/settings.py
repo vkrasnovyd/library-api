@@ -34,6 +34,8 @@ ALLOWED_HOSTS = []
 
 INTERNAL_IPS = ["127.0.0.1"]
 
+BASE_URL = os.environ.get("BASE_URL")
+
 # Application definition
 
 INSTALLED_APPS = [
