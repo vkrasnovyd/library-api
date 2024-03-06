@@ -1,7 +1,7 @@
 from rest_framework import mixins, viewsets
 
 from borrowings.models import Borrowing
-from borrowings.serializers import BorrowingSerializer
+from borrowings.serializers import BorrowingSerializer, BorrowingListSerializer
 from paginators import Pagination
 from permissions import IsUserAdminOrOwnInstancesAccessOnly
 
@@ -12,7 +12,6 @@ class BorrowingViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet,
 ):
-    serializer_class = BorrowingSerializer
     permission_classes = (IsUserAdminOrOwnInstancesAccessOnly,)
     pagination_class = Pagination
 
@@ -39,3 +38,13 @@ class BorrowingViewSet(
                     queryset = queryset.filter(is_active=False)
 
         return queryset
+
+    def get_serializer_class(self):
+
+        if self.action == "list":
+            return BorrowingListSerializer
+
+        return BorrowingSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(borrow_date=now().date())

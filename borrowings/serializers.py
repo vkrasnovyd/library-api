@@ -7,7 +7,18 @@ class BorrowingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Borrowing
+        fields = ("book", "user")
+
+
+class BorrowingListSerializer(serializers.ModelSerializer):
+    is_overdue = serializers.BooleanField()
+    book = serializers.StringRelatedField()
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Borrowing
         fields = (
+            "id",
             "book",
             "user",
             "is_active",
