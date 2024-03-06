@@ -4,8 +4,8 @@ from rest_framework import generics, viewsets, mixins
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 
-from paginators import Pagination
-from permissions import IsUserAdminOrOwnUserProfileAccessOnly
+from library_api.paginators import Pagination
+from library_api.permissions import IsUserAdminOrOwnUserProfileAccessOnly
 from users.serializers import (
     UserSerializer,
     UserDetailSerializer,

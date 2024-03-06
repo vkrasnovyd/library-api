@@ -6,8 +6,8 @@ from rest_framework import mixins, viewsets
 
 from borrowings.models import Borrowing
 from borrowings.serializers import BorrowingSerializer, BorrowingListSerializer
-from paginators import Pagination
-from permissions import IsUserAdminOrOwnInstancesAccessOnly
+from library_api.paginators import Pagination
+from library_api.permissions import IsUserAdminOrOwnInstancesAccessOnly
 
 
 def annotate_borrowing_is_overdue(queryset):
