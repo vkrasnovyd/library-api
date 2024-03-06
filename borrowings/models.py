@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 
 from books.models import Book
 
@@ -26,3 +27,6 @@ class Borrowing(models.Model):
             weeks=2
         )
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("borrowings:borrowing-detail", kwargs={"pk": self.id})

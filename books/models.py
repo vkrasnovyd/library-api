@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.urls import reverse
 
 BOOK_COVER_CHOICES = [
     ("H", "Hard"),
@@ -26,3 +26,6 @@ class Book(models.Model):
             self.inventory = self.total_amount - num_borrowed_books
 
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("books:book-detail", kwargs={"pk": self.id})
