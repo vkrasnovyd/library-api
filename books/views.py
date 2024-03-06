@@ -8,6 +8,8 @@ from books.serializers import (
 )
 from paginators import Pagination
 from permissions import IsAdminUserOrReadOnly
+from library_api.paginators import Pagination
+from library_api.permissions import IsAdminUserOrReadOnly
 
 
 class BookViewSet(viewsets.ModelViewSet):
