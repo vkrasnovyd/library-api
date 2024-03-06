@@ -24,6 +24,7 @@ def get_sample_user(**params) -> User:
     defaults = {
         "username": f"user{num_users}",
         "password": "samplepass",
+        "email": f"user{num_users}@user.com",
         "first_name": "John",
         "last_name": "Doe",
     }
