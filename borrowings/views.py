@@ -12,7 +12,14 @@ class BorrowingViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Borrowing.objects.all()
     serializer_class = BorrowingSerializer
     permission_classes = (IsUserAdminOrOwnInstancesAccessOnly,)
     pagination_class = Pagination
+
+    def get_queryset(self):
+        queryset = Borrowing.objects.all()
+
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+
+        return queryset
