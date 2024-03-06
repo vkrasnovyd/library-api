@@ -27,10 +27,15 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
+    detail_url = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
-        fields = ("id", "first_name", "last_name")
+        fields = ("id", "first_name", "last_name", "detail_url")
+
+    @staticmethod
+    def get_detail_url(instance):
+        return instance.get_full_absolute_url()
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
