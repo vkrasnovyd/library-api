@@ -1,4 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from books.models import Book
 from books.serializers import (
@@ -6,8 +9,8 @@ from books.serializers import (
     BookDetailSerializer,
     BookCreateUpdateSerializer,
 )
-from paginators import Pagination
-from permissions import IsAdminUserOrReadOnly
+from borrowings.models import Borrowing
+from borrowings.serializers import BorrowingSerializer
 from library_api.paginators import Pagination
 from library_api.permissions import IsAdminUserOrReadOnly
 
@@ -47,3 +50,27 @@ class BookViewSet(viewsets.ModelViewSet):
             return BookCreateUpdateSerializer
 
         return BookDetailSerializer
+
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="borrow",
+        permission_classes=(IsAuthenticated,),
+    )
+    def borrow_toggle(self, request, pk=None):
+        book = Book.objects.get(id=pk)
+
+        if book.inventory > 0:
+            user = request.user
+            borrowing = Borrowing.objects.create(user=user, book=book)
+            book.save()
+            serializer = BorrowingSerializer(borrowing, many=False)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(
+            {
+                "error": "There are no copies of this book available for borrowing."
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
