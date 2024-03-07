@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.utils.timezone import now
 from rest_framework import generics, viewsets, mixins
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
@@ -11,6 +14,24 @@ from users.serializers import (
     UserDetailSerializer,
     UserListSerializer,
 )
+
+
+def annotate_user_num_borrowings(queryset):
+    tomorrow = now().date() + timedelta(days=1)
+
+    queryset = queryset.annotate(
+        num_active_borrowings=Count(
+            "borrowings", filter=Q(borrowings__is_active=True)
+        )
+    )
+    queryset = queryset.annotate(
+        num_overdue_borrowings=Count(
+            "borrowings",
+            filter=Q(borrowings__is_active=True)
+            & Q(borrowings__expected_return_date__lte=tomorrow),
+        )
+    )
+    return queryset
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -53,6 +74,9 @@ class UserViewSet(
                     | Q(first_name__icontains=search_string)
                     | Q(last_name__icontains=search_string)
                 ).distinct()
+
+        if self.action == "retrieve":
+            queryset = annotate_user_num_borrowings(queryset)
 
         return queryset
 

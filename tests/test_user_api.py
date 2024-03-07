@@ -11,6 +11,7 @@ from users.serializers import (
     UserDetailSerializer,
     UserListSerializer,
 )
+from users.views import annotate_user_num_borrowings
 
 USER_LIST_URL = reverse("users:user-list")
 USER_DETAIL_1_URL = reverse("users:user-detail", kwargs={"pk": 1})
@@ -30,6 +31,12 @@ def get_sample_user(**params) -> User:
     defaults.update(params)
 
     return User.objects.create_user(**defaults)
+
+
+def get_annotated_user_instance(user_id: int) -> User:
+    queryset = get_user_model().objects.all()
+    queryset = annotate_user_num_borrowings(queryset)
+    return queryset.get(id=user_id)
 
 
 class UnauthenticatedUserApiTests(TestCase):
@@ -68,15 +75,17 @@ class AuthenticatedUserApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_own_detail(self):
+        user = get_annotated_user_instance(self.user.id)
         res = self.client.get(USER_DETAIL_1_URL)
-        serializer = UserDetailSerializer(self.user)
+        serializer = UserDetailSerializer(user)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
     def test_get_own_detail_by_me_pk(self):
+        user = get_annotated_user_instance(self.user.id)
         res = self.client.get(USER_DETAIL_ME_URL)
-        serializer = UserDetailSerializer(self.user)
+        serializer = UserDetailSerializer(user)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
@@ -161,16 +170,18 @@ class AdminUserApiTests(TestCase):
 
     def test_get_other_user_detail(self):
         user = get_sample_user()
-        res = self.client.get(USER_DETAIL_2_URL)
 
+        user = get_annotated_user_instance(user.id)
+        res = self.client.get(USER_DETAIL_2_URL)
         serializer = UserDetailSerializer(user)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
     def test_get_own_detail(self):
+        user = get_annotated_user_instance(self.user.id)
         res = self.client.get(USER_DETAIL_1_URL)
-        serializer = UserDetailSerializer(self.user)
+        serializer = UserDetailSerializer(user)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
