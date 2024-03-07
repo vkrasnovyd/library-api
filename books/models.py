@@ -24,7 +24,7 @@ class Book(models.Model):
         if not self.id:
             self.inventory = self.total_amount
         else:
-            num_borrowed_books = self.borrowings.count()
+            num_borrowed_books = self.borrowings.filter(is_active=True).count()
             self.inventory = self.total_amount - num_borrowed_books
 
         super().save(*args, **kwargs)
