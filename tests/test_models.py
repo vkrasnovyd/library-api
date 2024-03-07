@@ -93,7 +93,9 @@ class BorrowingModelTests(TestCase):
     def test_borrowing_str_is_book_str_title_expected_return_date(self):
         borrowing = Borrowing.objects.create(**self.borrowing_data)
 
-        expected_return_date = borrowing.borrow_date + datetime.timedelta(weeks=2)
+        expected_return_date = borrowing.borrow_date + datetime.timedelta(
+            weeks=2
+        )
         expected_str = (
             f"{self.borrowing_data['book']} - {expected_return_date}"
         )
