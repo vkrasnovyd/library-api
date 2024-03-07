@@ -7,7 +7,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from borrowings.models import Borrowing
-from borrowings.serializers import BorrowingSerializer, BorrowingListSerializer
+from borrowings.serializers import (
+    BorrowingSerializer,
+    BorrowingListSerializer,
+    BorrowingDetailSerializer,
+)
 from library_api.paginators import Pagination
 from library_api.permissions import IsUserAdminOrOwnInstancesAccessOnly
 
@@ -58,6 +62,9 @@ class BorrowingViewSet(
 
         if self.action == "list":
             return BorrowingListSerializer
+
+        if self.action == "retrieve":
+            return BorrowingDetailSerializer
 
         return BorrowingSerializer
 
