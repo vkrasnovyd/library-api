@@ -2,7 +2,9 @@ from datetime import timedelta
 
 from django.db.models import Q
 from django.utils.timezone import now
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from borrowings.models import Borrowing
 from borrowings.serializers import BorrowingSerializer, BorrowingListSerializer
@@ -58,3 +60,30 @@ class BorrowingViewSet(
             return BorrowingListSerializer
 
         return BorrowingSerializer
+
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="return",
+        permission_classes=(IsUserAdminOrOwnInstancesAccessOnly,),
+    )
+    def return_toggle(self, request, pk=None):
+        borrowing = self.get_object()
+
+        if borrowing.is_active:
+            borrowing.is_active = False
+            borrowing.actual_return_date = now().date()
+            borrowing.save()
+
+            # Trigger book.save() method to update book.inventory
+            book = borrowing.book
+            book.save()
+
+            serializer = BorrowingSerializer(borrowing, many=False)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            {"error": "This borrowing is already returned."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
