@@ -12,9 +12,11 @@ from books.serializers import (
     BookListSerializer,
 )
 from borrowings.models import Borrowing
+from borrowings.serializers import BorrowingSerializer
 
 BOOK_LIST_URL = reverse("books:book-list")
 BOOK_DETAIL_URL = reverse("books:book-detail", kwargs={"pk": 1})
+BOOK_BORROW_TOGGLE_URL = reverse("books:book-borrow-toggle", kwargs={"pk": 1})
 
 
 SAMPLE_BOOK_DATA = {
@@ -89,6 +91,13 @@ class UnauthenticatedBookApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_get_book_borrow_toggle_auth_required(self):
+        book = get_sample_book()
+
+        res = self.client.get(BOOK_BORROW_TOGGLE_URL, args={"pk": book.id})
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class AuthenticatedBookApiTests(TestCase):
     def setUp(self):
@@ -124,6 +133,31 @@ class AuthenticatedBookApiTests(TestCase):
         res = self.client.delete(BOOK_DETAIL_URL)
 
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_book_borrow_toggle(self):
+        book = get_sample_book()
+
+        res = self.client.get(BOOK_BORROW_TOGGLE_URL, args={"pk": book.id})
+        borrowing = Borrowing.objects.get(id=1)
+        serializer = BorrowingSerializer(borrowing, many=False)
+        book = Book.objects.get(id=book.id)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(book.inventory, book.total_amount - 1)
+
+    def test_book_borrow_toggle_returns_bad_request_if_book_inventory_is_zero(
+        self,
+    ):
+        book = get_sample_book(total_amount=0)
+
+        res = self.client.get(BOOK_BORROW_TOGGLE_URL, args={"pk": book.id})
+        expected_error_message = (
+            "There are no copies of this book available for borrowing."
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data["error"], expected_error_message)
 
 
 class AdminBookApiTests(TestCase):
