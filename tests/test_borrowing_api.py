@@ -7,7 +7,10 @@ from rest_framework.test import APIClient
 
 from books.models import Book
 from borrowings.models import Borrowing
-from borrowings.serializers import BorrowingListSerializer, BorrowingSerializer
+from borrowings.serializers import (
+    BorrowingListSerializer,
+    BorrowingDetailSerializer,
+)
 from borrowings.views import annotate_borrowing_is_overdue
 from tests.test_book_api import get_sample_book
 from tests.test_user_api import get_sample_user
@@ -122,7 +125,8 @@ class AuthenticatedBorrowingApiTests(TestCase):
         borrowing = get_sample_borrowing(user=self.user)
 
         res = self.client.get(BORROWING_DETAIL_URL)
-        serializer = BorrowingSerializer(borrowing)
+        borrowings = annotate_borrowing_is_overdue(Borrowing.objects.all())
+        serializer = BorrowingDetailSerializer(borrowings.get(id=borrowing.id))
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
