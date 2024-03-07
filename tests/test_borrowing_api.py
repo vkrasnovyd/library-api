@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from books.models import Book
 from borrowings.models import Borrowing
 from borrowings.serializers import BorrowingListSerializer, BorrowingSerializer
 from borrowings.views import annotate_borrowing_is_overdue
@@ -12,6 +14,9 @@ from tests.test_user_api import get_sample_user
 
 BORROWING_LIST_URL = reverse("borrowings:borrowing-list")
 BORROWING_DETAIL_URL = reverse("borrowings:borrowing-detail", kwargs={"pk": 1})
+BORROWING_RETURN_TOGGLE_URL = reverse(
+    "borrowings:borrowing-return-toggle", kwargs={"pk": 1}
+)
 
 
 SAMPLE_PAYLOAD = {
@@ -47,6 +52,11 @@ class UnauthenticatedBorrowingApiTests(TestCase):
 
     def test_get_borrowing_detail_auth_required(self):
         res = self.client.get(BORROWING_DETAIL_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_borrowing_return_toggle_auth_required(self):
+        res = self.client.get(BORROWING_RETURN_TOGGLE_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -116,6 +126,39 @@ class AuthenticatedBorrowingApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_return_borrowing_toggle(self):
+        book = get_sample_book()
+        borrowing = get_sample_borrowing(book=book, user=self.user)
+
+        res = self.client.get(BORROWING_RETURN_TOGGLE_URL)
+        borrowing = Borrowing.objects.get(id=borrowing.id)
+        book = Book.objects.get(id=book.id)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertFalse(borrowing.is_active)
+        self.assertEqual(borrowing.actual_return_date, now().date())
+        self.assertEqual(book.inventory, book.total_amount)
+
+    def test_return_borrowing_toggle_when_is_active_false_returns_bad_request(
+        self,
+    ):
+        borrowing = get_sample_borrowing(user=self.user)
+        borrowing.is_active = False
+        borrowing.save()
+
+        res = self.client.get(BORROWING_RETURN_TOGGLE_URL)
+        expected_error_message = "This borrowing is already returned."
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data["error"], expected_error_message)
+
+    def test_return_borrowing_toggle_accessible_only_for_own_borrowings(self):
+        get_sample_borrowing()
+
+        res = self.client.get(BORROWING_RETURN_TOGGLE_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_borrowing_forbidden(self):
         get_sample_borrowing(user=self.user)
@@ -187,6 +230,15 @@ class AdminBorrowingApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data["book"], book.id)
         self.assertEqual(res.data["user"], self.user.id)
+
+    def test_return_borrowing_toggle_accessible_not_only_for_own_borrowings(
+        self,
+    ):
+        get_sample_borrowing()
+
+        res = self.client.get(BORROWING_RETURN_TOGGLE_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_put_borrowing_not_allowed(self):
         get_sample_borrowing()
