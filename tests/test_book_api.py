@@ -3,7 +3,6 @@ import json
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -166,9 +165,7 @@ class AdminBookApiTests(TestCase):
 
     def test_put_book_with_active_borrowings(self):
         book = get_sample_book()
-        Borrowing.objects.create(
-            user=self.user, book=book, borrow_date=now().date()
-        )
+        Borrowing.objects.create(user=self.user, book=book)
         json_data = json.dumps(SAMPLE_BOOK_DATA)
 
         self.client.put(
