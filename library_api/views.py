@@ -18,6 +18,17 @@ class ApiRootView(GenericAPIView):
 
     def get(self, request, format=None):
         response_data = {
+            "Documentation": {
+                "Schema": reverse(
+                    "schema", request=request, format=format
+                ),
+                "Swagger documentation": reverse(
+                    "swagger", request=request, format=format
+                ),
+                "Redoc documentation": reverse(
+                    "redoc", request=request, format=format
+                ),
+            },
             "User endpoints": {
                 "My profile": reverse(
                     "users:user-detail",
