@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from borrowings.models import Borrowing
@@ -31,6 +33,7 @@ class BorrowingListSerializer(serializers.ModelSerializer):
         )
 
     @staticmethod
+    @extend_schema_field(OpenApiTypes.URI_TPL)
     def get_detail_url(instance):
         return instance.get_full_absolute_url()
 
