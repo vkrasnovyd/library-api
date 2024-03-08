@@ -1,4 +1,6 @@
 from django.utils.http import urlencode
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -16,8 +18,35 @@ def reverse_with_params(*args, **kwargs):
 class ApiRootView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
+    @extend_schema(
+        responses={
+            200: inline_serializer(
+                name="ApiRootResponse",
+                fields={
+                    "Auth endpoints": serializers.URLField(),
+                    "Managing own profile endpoints": serializers.URLField(),
+                    "Retrieving users and posts endpoints": serializers.URLField(),
+                },
+            )
+        }
+    )
     def get(self, request, format=None):
+        """
+        Root endpoint with links to the key endpoints.
+        """
+
         response_data = {
+            "Documentation": {
+                "Schema": reverse(
+                    "schema", request=request, format=format
+                ),
+                "Swagger documentation": reverse(
+                    "swagger", request=request, format=format
+                ),
+                "Redoc documentation": reverse(
+                    "redoc", request=request, format=format
+                ),
+            },
             "User endpoints": {
                 "My profile": reverse(
                     "users:user-detail",

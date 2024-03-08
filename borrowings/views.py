@@ -2,6 +2,8 @@ from datetime import timedelta
 
 from django.db.models import Q
 from django.utils.timezone import now
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -75,6 +77,10 @@ class BorrowingViewSet(
         permission_classes=(IsUserAdminOrOwnInstancesAccessOnly,),
     )
     def return_toggle(self, request, pk=None):
+        """
+        Endpoint for marking borrowing instance as inactive.
+        """
+
         borrowing = self.get_object()
 
         if borrowing.is_active:
@@ -94,3 +100,21 @@ class BorrowingViewSet(
             {"error": "This borrowing is already returned."},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+    # Only for documentation purposes
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                type=OpenApiTypes.INT,
+                description="Filter by user_id (available to staff users) (ex. ?user_id=1)",
+            ),
+            OpenApiParameter(
+                name="is_available",
+                type=OpenApiTypes.BOOL,
+                description="Filter by is_active (ex. ?is_active=true)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)

@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from settings import BASE_URL
@@ -38,6 +40,7 @@ class UserListSerializer(serializers.ModelSerializer):
         fields = ("id", "first_name", "last_name", "detail_url")
 
     @staticmethod
+    @extend_schema_field(OpenApiTypes.URI_TPL)
     def get_detail_url(instance):
         return instance.get_full_absolute_url()
 
@@ -61,6 +64,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         )
 
     @staticmethod
+    @extend_schema_field(OpenApiTypes.URI_TPL)
     def get_active_borrowings_url(instance):
         user_active_borrowings_list_url = reverse_with_params(
             "borrowings:borrowing-list",
