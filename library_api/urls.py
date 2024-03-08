@@ -18,6 +18,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from views import ApiRootView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("__debug__/", include("debug_toolbar.urls")),
@@ -26,4 +28,5 @@ urlpatterns = [
     path(
         "api/borrowings/", include("borrowings.urls", namespace="borrowings")
     ),
+    path("", ApiRootView.as_view(), name="api_root"),
 ]
