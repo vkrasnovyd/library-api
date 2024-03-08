@@ -34,9 +34,9 @@ class BookViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(author__icontains=author)
 
             if is_available is not None:
-                if is_available == "True":
+                if is_available == "true":
                     queryset = queryset.filter(inventory__gt=0)
-                elif is_available == "False":
+                elif is_available == "false":
                     queryset = queryset.filter(inventory__exact=0)
 
         return queryset
