@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -58,6 +60,11 @@ class BookViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def borrow_toggle(self, request, pk=None):
+        """
+        Endpoint for creating borrowing instance for the selected book
+        assigned to the current user.
+        """
+
         book = Book.objects.get(id=pk)
 
         if book.inventory > 0:
@@ -74,3 +81,26 @@ class BookViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+    # Only for documentation purposes
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="title",
+                type=OpenApiTypes.STR,
+                description="Filter by title part (case insensitive) (ex. ?title=new)",
+            ),
+            OpenApiParameter(
+                name="author",
+                type=OpenApiTypes.STR,
+                description="Filter by part of author name (case insensitive) (ex. ?author=john)",
+            ),
+            OpenApiParameter(
+                name="is_available",
+                type=OpenApiTypes.BOOL,
+                description="true for inventory > 0, false for inventory == 0 (ex. ?is_available=true)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
