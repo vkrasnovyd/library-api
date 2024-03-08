@@ -51,9 +51,9 @@ class BorrowingViewSet(
             is_active = self.request.query_params.get("is_active", None)
 
             if is_active:
-                if is_active == "True":
+                if is_active == "true":
                     queryset = queryset.filter(is_active=True)
-                elif is_active == "False":
+                elif is_active == "false":
                     queryset = queryset.filter(is_active=False)
 
         return queryset
