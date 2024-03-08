@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from settings import BASE_URL
+from views import reverse_with_params
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -61,6 +62,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_active_borrowings_url(instance):
-        user_active_borrowings_list_url = reverse("borrowings:borrowing-list")
-        query_params = f"is_active=True&user_id={instance.id}"
-        return f"{BASE_URL}{user_active_borrowings_list_url}?{query_params}"
+        user_active_borrowings_list_url = reverse_with_params(
+            "borrowings:borrowing-list",
+            params={"is_active": "True", "user_id": instance.id},
+        )
+        return f"{BASE_URL}{user_active_borrowings_list_url}"
