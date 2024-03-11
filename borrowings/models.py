@@ -27,9 +27,9 @@ class Borrowing(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             self.borrow_date = now().date()
-        self.expected_return_date = self.borrow_date + datetime.timedelta(
-            weeks=2
-        )
+            self.expected_return_date = self.borrow_date + datetime.timedelta(
+                weeks=2
+            )
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
