@@ -37,9 +37,7 @@ class ApiRootView(GenericAPIView):
 
         response_data = {
             "Documentation": {
-                "Schema": reverse(
-                    "schema", request=request, format=format
-                ),
+                "Schema": reverse("schema", request=request, format=format),
                 "Swagger documentation": reverse(
                     "swagger", request=request, format=format
                 ),
