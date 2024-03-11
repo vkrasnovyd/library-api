@@ -37,9 +37,7 @@ class ApiRootView(GenericAPIView):
 
         response_data = {
             "Documentation": {
-                "Schema": reverse(
-                    "schema", request=request, format=format
-                ),
+                "Schema": reverse("schema", request=request, format=format),
                 "Swagger documentation": reverse(
                     "swagger", request=request, format=format
                 ),
@@ -60,6 +58,9 @@ class ApiRootView(GenericAPIView):
                     format=format,
                     params={"is_active": "True", "user_id": request.user.id},
                 ),
+                "Books": reverse(
+                    "books:book-list", request=request, format=format
+                ),
             },
         }
 
@@ -67,9 +68,6 @@ class ApiRootView(GenericAPIView):
             response_data.update(
                 {
                     "Admin endpoints": {
-                        "Books": reverse(
-                            "books:book-list", request=request, format=format
-                        ),
                         "Users": reverse(
                             "users:user-list", request=request, format=format
                         ),
