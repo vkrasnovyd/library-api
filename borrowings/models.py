@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 
 from books.models import Book
-from settings import BASE_URL
+from library_api.settings import BASE_URL
 
 
 class Borrowing(models.Model):

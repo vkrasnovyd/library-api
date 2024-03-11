@@ -23,7 +23,7 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from views import ApiRootView
+from library_api.views import ApiRootView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
