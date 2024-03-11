@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 
-from settings import BASE_URL
+from library_api.settings import BASE_URL
 
 
 class User(AbstractUser):

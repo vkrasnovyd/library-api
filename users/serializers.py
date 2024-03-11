@@ -4,8 +4,8 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from settings import BASE_URL
-from views import reverse_with_params
+from library_api.settings import BASE_URL
+from library_api.views import reverse_with_params
 
 
 class UserSerializer(serializers.ModelSerializer):
