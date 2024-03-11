@@ -14,6 +14,7 @@ from borrowings.serializers import (
     BorrowingListSerializer,
     BorrowingDetailSerializer,
 )
+from borrowings.telegram_bot import send_telegram_notification
 from library_api.paginators import Pagination
 from library_api.permissions import IsUserAdminOrOwnInstancesAccessOnly
 
@@ -93,6 +94,17 @@ class BorrowingViewSet(
             book.save()
 
             serializer = BorrowingSerializer(borrowing, many=False)
+
+            days_overdue = max(0, (borrowing.actual_return_date - borrowing.expected_return_date).days)
+            money_to_pay = borrowing.book.daily_fee * days_overdue
+            text = (
+                f"Borrowing №{borrowing.id} is returned.\n\n"
+                f"Book: {borrowing.book}\n"
+                f"Copies left: {book.inventory}\n\n"
+                f"Days overdue: {days_overdue}\n"
+                f"Money to pay overdue: ${money_to_pay}\n"
+            )
+            send_telegram_notification(text)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
