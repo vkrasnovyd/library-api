@@ -13,6 +13,7 @@ from books.serializers import (
 )
 from borrowings.models import Borrowing
 from borrowings.serializers import BorrowingSerializer
+from borrowings.telegram_bot import send_telegram_notification
 from library_api.paginators import Pagination
 from library_api.permissions import IsAdminUserOrReadOnly
 
@@ -72,6 +73,14 @@ class BookViewSet(viewsets.ModelViewSet):
             borrowing = Borrowing.objects.create(user=user, book=book)
             book.save()
             serializer = BorrowingSerializer(borrowing, many=False)
+
+            text = (
+                f"New borrowing №{borrowing.id} created.\n\n"
+                f"User: {user}\n"
+                f"Book: {book}\n"
+                f"Copies left: {book.inventory}"
+            )
+            send_telegram_notification(text)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
